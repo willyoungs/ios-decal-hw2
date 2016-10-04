@@ -21,9 +21,11 @@ class ViewController: UIViewController {
     
     // TODO: This looks like a good place to add some data structures.
     //       One data structure is initialized below for reference.
-    var someDataStructure: [String] = [""]
-    
-
+    var calculatorArgs: [String] = [""]
+    var currWindow = "0"
+    var decimalPushed = false
+    var newNumber = true
+    var equalsPressed = false
     override func viewDidLoad() {
         super.viewDidLoad()
         view = UIView(frame: UIScreen.main.bounds)
@@ -79,18 +81,90 @@ class ViewController: UIViewController {
     // REQUIRED: The responder to a number button being pressed.
     func numberPressed(_ sender: CustomButton) {
         guard Int(sender.content) != nil else { return }
-        print("The number \(sender.content) was pressed")
-        // Fill me in!
+        if newNumber{
+            resultLabel.text = ""
+        }
+        if (resultLabel.text?.characters.count)! < 7{
+            resultLabel.text = resultLabel.text! + String(sender.content)
+        }
+        newNumber = false
     }
     
     // REQUIRED: The responder to an operator button being pressed.
     func operatorPressed(_ sender: CustomButton) {
-        // Fill me in!
+        var val = sender.content
+        newNumber = true
+        switch val {
+        case "=": // Invalid, the case has an empty body
+            calculatorArgs.append(resultLabel.text!)
+            let x = calculatorArgs.joined(separator: "")
+            let expn = NSExpression(format: x)
+            
+            resultLabel.text = String(describing: expn.expressionValue(with: nil, context: nil) as!NSNumber)
+            
+            calculatorArgs = ["",(resultLabel.text)!]
+            equalsPressed = true
+            print (calculatorArgs)
+        case "C":
+            resultLabel.text = "0"
+        case "+/-":
+            if (resultLabel.text?.contains("-"))! {
+                resultLabel.text?.remove(at: (resultLabel.text?.startIndex)!)
+            } else{
+                resultLabel.text = "-" + resultLabel.text!
+            }
+        default:
+            print(calculatorArgs)
+            if !decimalPushed {
+                resultLabel.text = resultLabel.text! + ".0"
+                decimalPushed = false
+            }
+            if calculatorArgs.count == 1 {
+                calculatorArgs.append(resultLabel.text!)
+                calculatorArgs.append(val)
+            } else {
+                print("dddkdljk")
+                print(calculatorArgs)
+                if !equalsPressed{
+                    calculatorArgs.append(resultLabel.text!)
+                
+                let x = calculatorArgs.joined(separator: "")
+                let expn = NSExpression(format: x)
+                let new = String(describing: expn.expressionValue(with: nil, context: nil) as!NSNumber)
+                print(new)
+                resultLabel.text = new
+                calculatorArgs = ["",new,val]
+                print(calculatorArgs)
+                } else {
+                    calculatorArgs.append(val)
+                    equalsPressed = false
+                }
+            }
+        }
     }
     
     // REQUIRED: The responder to a number or operator button being pressed.
     func buttonPressed(_ sender: CustomButton) {
-       // Fill me in!
+        var val = sender.content
+        switch val {
+            case ".":
+                decimalPushed = true
+                newNumber = false
+                resultLabel.text! = resultLabel.text! + "."
+            case "0":
+                if resultLabel.text == "0"{
+                    resultLabel.text = "0"
+                    
+                }else if (newNumber){
+                    resultLabel.text = "0"
+                    newNumber = false
+                }else if (resultLabel.text?.characters.count)! < 7 {
+                    resultLabel.text = resultLabel.text! + String(sender.content)
+                }
+        default:
+            print("Weird")
+            
+        }
     }
     
     // IMPORTANT: Do NOT change any of the code below.
