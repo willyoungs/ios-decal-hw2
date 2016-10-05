@@ -99,14 +99,25 @@ class ViewController: UIViewController {
             calculatorArgs.append(resultLabel.text!)
             let x = calculatorArgs.joined(separator: "")
             let expn = NSExpression(format: x)
-            
-            resultLabel.text = String(describing: expn.expressionValue(with: nil, context: nil) as!NSNumber)
+            var newScreen = String(describing: expn.expressionValue(with: nil, context: nil) as!NSNumber)
+            if newScreen.characters.count > 7 {
+                let sciVal = Int(newScreen)
+                let numberFormatter = NumberFormatter()
+                numberFormatter.numberStyle = NumberFormatter.Style.scientific
+                numberFormatter.positiveFormat = "0.###E+0"
+                numberFormatter.exponentSymbol = "e"
+                if let stringFromNumber = numberFormatter.string(from: NSNumber(value:sciVal!)){
+                    newScreen = stringFromNumber
+                }
+            }
+            resultLabel.text = newScreen
             
             calculatorArgs = ["",(resultLabel.text)!]
             equalsPressed = true
             print (calculatorArgs)
         case "C":
             resultLabel.text = "0"
+            calculatorArgs = [""]
         case "+/-":
             if (resultLabel.text?.contains("-"))! {
                 resultLabel.text?.remove(at: (resultLabel.text?.startIndex)!)
